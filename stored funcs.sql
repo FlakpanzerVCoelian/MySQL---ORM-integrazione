@@ -33,7 +33,7 @@ delimiter ;
 
 delimiter $$$ 
 create procedure contarefimgs(IN IDPERS varchar(25)) begin
-	select count(pi.`ID Immagine`) as nrif from Persona p join Soggetto using (`ID Persona`) join `File` ff using(`File ID`) join `Persona in immagine` pi on ff.`File ID` = pi.`ID File` where p.`ID Persona` = IDPERS group by `ID Immagine`;
+	select count(pi.`ID Immagine`) as nrif from Persona p join Soggetto using (`ID Persona`) join `File` ff using(`File ID`) join `Persona in immagine` pi on ff.`File ID` = pi.`ID File` where p.`ID Persona` = IDPERS;
 END $$$
 delimiter ;
 
@@ -135,6 +135,25 @@ create procedure ChiCOMMS(IN IDSOGG VARCHAR(30), IN tipo char(4)) begin
 		select distinct pers.Cognome from mail ma join destinatari dest using(`Mail ID`) join persona pers using(`ID Persona`) where 
 		ma.`Mail ID` in (select `Mail ID` from mail ma2 where `ID Mittente Organizzazione` = IDSOGG) union (select distinct org.nome from mail ma join destinatari dest using(`Mail ID`) 
 		join organizzazione org using(`ID Organizzazione`) where ma.`Mail ID` in (select `Mail ID` from mail ma2 where `ID Mittente Organizzazione` = IDSOGG));
+	else
+		signal sqlstate "45540"
+        set message_text = "Argomenti invalidi per la SP ChiCOMMS(. , .)";
+	end if;
+END $$$
+delimiter ;
+
+drop procedure ChiCOMMS;
+
+delimiter $$$
+create procedure ChiCOMMS(IN IDSOGG VARCHAR(30), IN tipo char(4)) begin
+	if tipo = "pers" then
+		select distinct pers.Cognome from Mail m join Destinatari dest using(`Mail ID`) join Persona pers using (`ID Persona`) where m.`ID Mittente Persona` = IDSOGG and
+        pers.`ID Persona` != IDSOGG union select distinct pers.Cognome from Destinatari dest join Mail m using(`Mail ID`) join Persona pers using (`ID Persona`) where 
+        dest.`ID Persona` = IDSOGG and pers.`ID Persona` != IDSOGG;
+	elseif tipo = "org" then
+		select distinct pers.Nome from Mail m join Destinatari dest using(`Mail ID`) join Organizzazione pers using (`ID Organizzazione`) where m.`ID Mittente Organizzazione` = IDSOGG and
+        pers.`ID Organizzazione` != IDSOGG union select distinct pers.Nome from Destinatari dest join Mail m using(`Mail ID`) join Organizzazione pers using (`ID Organizzazione`) where 
+        dest.`ID Organizzazione` = IDSOGG and pers.`ID Organizzazione` != IDSOGG;
 	else
 		signal sqlstate "45540"
         set message_text = "Argomenti invalidi per la SP ChiCOMMS(. , .)";
@@ -295,3 +314,67 @@ create trigger `dopo di prima IMG AU` after update on `Immagine` for each row be
 	end if;
 END $$$
 delimiter ;	
+
+-- stored procedure ausiliari
+
+delimiter $$$
+create procedure getPERS() begin
+	select nome, cognome, `Tipo/Ruolo`, `ID Persona` from Persona;
+END $$$
+delimiter ;
+
+delimiter $$$
+create procedure getORG() begin
+	select nome, tipo, `ID Organizzazione` from Organizzazione;
+END $$$
+delimiter ;
+
+delimiter $$$
+create procedure getFILE() begin
+	select `File ID`, link, `data`, `Redacted %` from File;
+END $$$
+delimiter ;
+
+delimiter $$$
+create procedure getALLMAILS() begin
+	select `Org o Pers`, `ID Mittente Persona`, `ID Mittente Organizzazione`, `tipo`, `Oggetto` from `Mail`;
+END $$$
+delimiter ;
+
+delimiter $$$
+create procedure getALLIMGS() begin
+	select `ID Immagine`, Descrizione, `Redacted%`, `Nome Luogo`, `Data e tempo` from Immagine;
+END $$$
+delimiter ;
+
+delimiter $$$
+create procedure IMGSinFILE(IN IDFILE CHAR(20)) begin
+	select * from `Persona in immagine` where `ID File` = IDFILE;
+END $$$
+delimiter ;
+
+delimiter $$$
+create procedure COMMSinFILE(IN IDFILE CHAR(20)) begin
+	select `Org o Pers`, `ID Mittente Persona`, `ID Mittente Organizzazione`, `tipo`, `Oggetto` from `Mail` where `File ID` = IDFILE;
+END $$$
+delimiter ;
+
+delimiter $$$
+create procedure descrIMG(IN IDIMG char(30)) begin
+	select `File ID`, link, Immagine.descrizione from Immagine join `Persona in immagine` using (`ID Immagine`) join `File` on `ID File` = `File ID` where `ID Immagine` = IDIMG;
+END $$$
+delimiter ;
+
+delimiter $$$
+create procedure descrCOMM(IN IDCOM char(30)) begin
+	select `File ID`, link, Mail.descrizione, oggetto, `ID Mittente Persona`, `ID Mittente Organizzazione`, `Org O Pers`, Risposta from Mail join `File` using (`File ID`) where `Mail ID` = IDCOM;
+END $$$
+delimiter ;
+
+
+delimiter $$$
+create procedure getdest(IN IDCOM char(30)) begin
+	select org.nome, org.`ID Organizzazione` from Destinatari dest join Organizzazione org using(`ID Organizzazione`) where `Pers o org` = "org" and `Mail ID` = IDCOM union 
+    (select pers.cognome, pers.`ID Persona` from Destinatari d join Persona pers using(`ID Persona`) where `Pers o org` = "pers" and `Mail ID` = IDCOM);
+END $$$
+delimiter ;
