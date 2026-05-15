@@ -6,7 +6,7 @@ insert into `File` values("EFTA00163914", "https://www.justice.gov/epstein/files
 insert into `File` values("EFTA00163940","https://www.justice.gov/epstein/files/DataSet%209/EFTA00163940.pdf", "2025-01-01", "8", "95", "ZIONIST NYPD", 15);
 insert into `File` values("EFTA01626049","https://www.justice.gov/epstein/files/DataSet%2010/EFTA01626049.pdf", "2025-01-01", "8", "50", "Liste di chiamate", 15);
 
-INSERT INTO `Persona` VALUES ('CSFSVSVFSV','Alonzo','Quinn',NULL,NULL,'M','Stati Uniti',NULL,NULL,NULL,'Poliziotto corrotto',NULL),('PSCOP','Patrick','Simmons',NULL,NULL,'M','Stati Uniti',NULL,NULL,NULL,'Poliziotto corrotto',NULL);
+INSERT INTO `Persona` VALUES ('CSFSVSVFSV','Alonzo','Quinn',NULL,NULL,'M','Stati Uniti',NULL,NULL,NULL,'Poliziotto corrotto',NULL, NULL, NULL),('PSCOP','Patrick','Simmons',NULL,NULL,'M','Stati Uniti',NULL,NULL,NULL,'Poliziotto corrotto',NULL, NULL);
 insert into Persona values ("JLCOP", "John", "Laskey", NULL, NULL, "M", "Stati Uniti", NULL, NULL, NULL, 'Poliziotto corrotto', NULL);
 insert into Persona values ("unknown", "John", "Reese", NULL, NULL, "M", "Stati Uniti", NULL, NULL, NULL, "Agente", NULL);
 insert into Persona values ("secret", "Harold", "Finch", NULL, NULL, "M", "Stati Uniti", NULL, NULL, NULL, "Ingegnere AI", NULL);

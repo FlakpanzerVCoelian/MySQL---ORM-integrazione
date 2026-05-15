@@ -67,10 +67,12 @@ CREATE TABLE IF NOT EXISTS `mydb`.`Lavoro` (
   PRIMARY KEY (`Num. Lavoro`, `Id lavoratore`, `OrgOpers`))
 ENGINE = InnoDB;
 
+alter table `mydb`.`Lavoro` add `Inizio contratto` date;
+alter table `mydb`.`Lavoro` add `Fine contratto` date;
+
 CREATE TABLE IF NOT EXISTS `mydb`.`Mail` (
   `Mail ID` VARCHAR(25) NOT NULL,
   `File ID` CHAR(20) NOT NULL,
-  `ID Mittente Organizzazione` VARCHAR(30),
   `ID Mittente Persona` VARCHAR(30),
   `Org o Pers` ENUM("org", "pers") NOT NULL,
   `Data e Tempo` DATETIME(6) NOT NULL,
@@ -113,14 +115,19 @@ CREATE TABLE IF NOT EXISTS `mydb`.`Persona` (
   PRIMARY KEY (`ID Persona`))
 ENGINE = InnoDB;
 
+alter table `mydb`.`Persona` add `Data di nascita` date;
+alter table `mydb`.`Persona` add `Data di morte` date;
+
+
 CREATE TABLE IF NOT EXISTS `mydb`.`Persona in immagine` (
+  `N. rif immagine` INT(5) NOT NULL AUTO_INCREMENT,
   `ID Persona` VARCHAR(30) NULL DEFAULT NULL,
   `ID Immagine` VARCHAR(25) NOT NULL,
   `ID File` CHAR(20) NOT NULL,
-  PRIMARY KEY (`ID Immagine`, `ID File`),
+  PRIMARY KEY (`ID Immagine`, `ID File`, `N. rif immagine`),
   INDEX `ID Persona_idx` (`ID Persona` ASC) VISIBLE,
+  INDEX`N. rif immagine_IDX` (`N. rif immagine` ASC) VISIBLE,
   INDEX `ID File_idx` (`ID File` ASC) VISIBLE)
-
 ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS `mydb`.`Soggetto` (
